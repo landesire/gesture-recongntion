@@ -1,0 +1,58 @@
+import numpy as np
+
+def convert_to_one_hot(y, C):
+    return np.eye(C)[y.reshape(-1)]
+
+
+f = open("S_feature_all.txt")  # skip the header
+f_w = open("alldata.txt","w+")  # skip the header
+data = np.loadtxt(f, delimiter=',')
+label_list = []
+# data_min,data_max=data.min(),data.max()
+# data=(data-data_min)/(data_max-data_min)
+# data_min,data_max=data.min(),data.max()
+# data=(data-data_min)/(data_max-data_min)
+print(len(data))
+print(data[0])
+print(len(data[0]))
+curret_feature=[]
+list_data = data.tolist()
+#put data in time series format
+#改变特征，让每一帧的1-2-3维joint合并，然后再十帧一起排列
+for index in range(len(data)):
+    current_single_joint=list_data[index][0:480]
+    current_joint_pair=list_data[index][480:1800]
+    current_triple_joint=list_data[index][1800:6600]
+    for frame_index in range(10):
+        single_joint_feature=current_single_joint[48*frame_index:48*(frame_index+1)]
+        joint_pair_feature=current_joint_pair[132*frame_index:132*(frame_index+1)]
+        triple_joint_feature=current_triple_joint[480*frame_index:480*(frame_index+1)]
+        #print(single_joint_feature)
+        #print(triple_joint_feature)
+        curret_feature=curret_feature+single_joint_feature+joint_pair_feature+triple_joint_feature
+    data[index]=curret_feature
+    #print("after change")
+    #print(data[index][150])
+    curret_feature.clear()
+print(data)
+print(data[0])
+print(len(data[0]))
+#生成标注类别1-10类
+for i in range(len(data)):
+    label = (i /800)
+    label_list.append(label)
+        #print(label)
+y_label = np.array(label_list)
+y_label = y_label.reshape(-1, 1)
+# print y_train2
+print(len(y_label))
+all_data = np.hstack((y_label, data))
+print("this is all data")
+print(all_data[255][125])
+print("all data shape"+str(all_data.shape))
+data_label=all_data[:, 0].astype(np.int)
+print(data_label)
+data_label_size = data_label.shape[0]
+data_label = data_label.reshape(data_label_size, 1)
+data_label = convert_to_one_hot(data_label, 10)
+np.savetxt("alldata.txt",data_label)
