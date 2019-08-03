@@ -10,6 +10,6 @@ CNN model : Conv2d + one layer
 
 RNN model: LSTM (one layer rnncell)
 
-with &slyvia lynne very happy time thanks a lot 
+with &slyvia lynne(from HKU) very happy time thanks a lot 
 
 
